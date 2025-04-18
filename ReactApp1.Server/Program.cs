@@ -6,10 +6,14 @@ using ReactApp1.Server.Models;
 using ReactApp1.Server.Services;
 using ReactApp1.Server.Data;
 using System.Text;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});
 
 builder.Services.AddSwaggerGen(options =>
 {

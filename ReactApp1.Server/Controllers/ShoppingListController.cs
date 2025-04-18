@@ -41,17 +41,23 @@ public class ShoppingListController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ShoppingList>> Create(ShoppingList list)
+    public async Task<ActionResult<ShoppingList>> Create([FromBody] ShoppingListCreateDto dto)
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-        list.OwnerId = userId;
-        list.CreatedAt = DateTime.UtcNow;
+
+        var list = new ShoppingList
+        {
+            Name = dto.Name,
+            OwnerId = userId,
+            CreatedAt = DateTime.UtcNow
+        };
 
         _context.ShoppingLists.Add(list);
         await _context.SaveChangesAsync();
 
         return CreatedAtAction(nameof(GetList), new { id = list.Id }, list);
     }
+
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, ShoppingList list)
