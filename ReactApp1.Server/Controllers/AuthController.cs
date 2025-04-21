@@ -64,7 +64,6 @@ public class AuthController : ControllerBase
     }
 
 
-    // 🔐 Примитивное SHA256-хэширование пароля
     private string HashPassword(string password)
     {
         using var sha = SHA256.Create();
