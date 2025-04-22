@@ -1,10 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ReactApp1.Server.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using ReactApp1.Server.Models.Dtos;
+using ReactApp1.Server.Models;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
-namespace ReactApp1.Server.Controllers;
+
 [Authorize]
 [Route("api/[controller]")]
 [ApiController]
@@ -17,47 +18,73 @@ public class ListItemController : ControllerBase
         _context = context;
     }
 
+    // ✅ GET /api/listitem/{listId}
     [HttpGet("{listId}")]
-    public async Task<ActionResult<IEnumerable<ListItem>>> GetItems(int listId)
+    public async Task<ActionResult<IEnumerable<ListItemDto>>> GetItems(int listId)
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
         var list = await _context.ShoppingLists.FindAsync(listId);
         if (list == null || list.OwnerId != userId) return Forbid();
 
-        return await _context.ListItems
+        var items = await _context.ListItems
             .Where(i => i.ListId == listId)
             .Include(i => i.Product)
             .ToListAsync();
+
+        var result = items.Select(i => new ListItemDto
+        {
+            Id = i.Id,
+            ProductName = i.Product?.Name,
+            CustomName = i.CustomName,
+            Quantity = i.Quantity,
+            IsBought = i.IsBought
+        });
+
+        return Ok(result);
     }
 
+    // ✅ POST /api/listitem
     [HttpPost]
-    public async Task<ActionResult<ListItem>> CreateItem(ListItem item)
+    public async Task<IActionResult> AddItem([FromBody] ListItemCreateDto dto)
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-        var list = await _context.ShoppingLists.FindAsync(item.ListId);
-        if (list == null || list.OwnerId != userId) return Forbid();
+
+        var item = new ListItem
+        {
+            ListId = dto.ListId,
+            ProductId = dto.ProductId,
+            CustomName = dto.CustomName,
+            Quantity = dto.Quantity,
+            IsBought = false
+        };
 
         _context.ListItems.Add(item);
         await _context.SaveChangesAsync();
 
-        return Ok(item);
+        return Ok(new { item.Id });
     }
 
+    // ✅ PUT /api/listitem/{id}
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateItem(int id, ListItem item)
+    public async Task<IActionResult> UpdateItem(int id, [FromBody] ListItemUpdateDto dto)
     {
-        if (id != item.Id) return BadRequest();
+        var item = await _context.ListItems.FindAsync(id);
+        if (item == null) return NotFound();
 
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
         var list = await _context.ShoppingLists.FindAsync(item.ListId);
         if (list == null || list.OwnerId != userId) return Forbid();
 
-        _context.Entry(item).State = EntityState.Modified;
+        item.Quantity = dto.Quantity;
+        item.CustomName = dto.CustomName;
+        item.IsBought = dto.IsBought;
+
         await _context.SaveChangesAsync();
 
         return NoContent();
     }
 
+    // ✅ DELETE /api/listitem/{id}
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteItem(int id)
     {

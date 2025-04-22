@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
@@ -39,7 +39,7 @@ export default function MyListsPage() {
         if (!token) return;
 
         axios
-            .get('/api/shoppinglist/my', {
+            .get('/api/shoppinglist', {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

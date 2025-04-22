@@ -28,6 +28,35 @@ export default function ListEditorPage() {
     const token = useSelector((state: RootState) => state.auth.token);
     const [list, setList] = useState<ShoppingList | null>(null);
 
+    const [newItemName, setNewItemName] = useState('');
+    const [quantity, setQuantity] = useState(1);
+
+    const handleAddItem = async () => {
+        if (!token || !list || newItemName.trim() === '') return;
+
+        try {
+            await axios.post('/api/listitem', {
+                listId: list.id,
+                customName: newItemName,
+                quantity,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            
+            const res = await axios.get(`/api/shoppinglist/${list.id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setList(res.data);
+            setNewItemName('');
+            setQuantity(1);
+        } catch (err) {
+            console.error('Ошибка добавления товара:', err);
+        }
+    };
+
     useEffect(() => {
         if (!id || !token) return;
 
@@ -41,17 +70,65 @@ export default function ListEditorPage() {
 
     if (!list) return <p>Загрузка...</p>;
 
+    const toggleBought = async (itemId: number) => {
+        try {
+            await axios.put(`/api/listitem/${itemId}/toggle`, {}, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            
+            const res = await axios.get(`/api/shoppinglist/${list?.id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setList(res.data);
+        } catch (err) {
+            console.error('Ошибка при переключении:', err);
+        }
+    };
+
+    const deleteItem = async (itemId: number) => {
+        try {
+            await axios.delete(`/api/listitem/${itemId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const res = await axios.get(`/api/shoppinglist/${list?.id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setList(res.data);
+        } catch (err) {
+            console.error('Ошибка при удалении:', err);
+        }
+    };
+
     return (
         <div>
             <h2>{list.name}</h2>
+
+            <div>
+                <input
+                    placeholder="Товар"
+                    value={newItemName}
+                    onChange={(e) => setNewItemName(e.target.value)}
+                />
+                <input
+                    type="number"
+                    min={1}
+                    value={quantity}
+                    onChange={(e) => setQuantity(Number(e.target.value))}
+                />
+                <button onClick={handleAddItem}>Добавить</button>
+            </div>
+
             <ul>
                 {list.items.map(item => (
                     <li key={item.id}>
-                        {item.product?.name || item.customName} – {item.quantity} шт. –
+                        {item.product?.name || item.customName} – {item.quantity} шт –
                         <strong> {item.isBought ? '✔ Куплено' : '❌ Не куплено'}</strong>
+                        <button onClick={() => toggleBought(item.id)}>✔✖</button>
+                        <button onClick={() => deleteItem(item.id)}>Удалить</button>
                     </li>
                 ))}
             </ul>
+
         </div>
     );
 }

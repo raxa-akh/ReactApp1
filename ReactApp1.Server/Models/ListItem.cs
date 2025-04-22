@@ -6,7 +6,7 @@ namespace ReactApp1.Server.Models
         public int Id { get; set; }
 
         public int ListId { get; set; }
-        public ShoppingList List { get; set; }
+        public ShoppingList? List { get; set; }
 
         public int? ProductId { get; set; }
         public Product? Product { get; set; }
