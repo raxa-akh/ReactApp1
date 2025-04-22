@@ -2,13 +2,13 @@ using ReactApp1.Server.Models;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace ReactApp1.Server.Data;
+namespace ReactApp1.Server.Models;
 
 public class DbSeeder
 {
     public static void Seed(AppDbContext context)
     {
-        if (context.Users.Any()) return; // уже есть данные
+        if (context.Users.Any()) return;
 
         string Hash(string password)
         {
@@ -17,7 +17,7 @@ public class DbSeeder
             return Convert.ToBase64String(bytes);
         }
 
-        // Пользователи
+        // --- РџРѕР»СЊР·РѕРІР°С‚РµР»Рё ---
         var admin = new User
         {
             Username = "admin",
@@ -39,18 +39,54 @@ public class DbSeeder
         context.Users.AddRange(admin, user);
         context.SaveChanges();
 
-        // Категории
-        var cat1 = new ProductCategory { Name = "Продукты" };
-        var cat2 = new ProductCategory { Name = "Хозяйственные товары" };
+        // --- РљР°С‚РµРіРѕСЂРёРё ---
+        var cat1 = new ProductCategory { Name = "РџСЂРѕРґСѓРєС‚С‹" };
+        var cat2 = new ProductCategory { Name = "РҐРѕР·СЏР№СЃС‚РІРµРЅРЅС‹Рµ С‚РѕРІР°СЂС‹" };
         context.ProductCategories.AddRange(cat1, cat2);
         context.SaveChanges();
 
-        // Товары
-        var p1 = new Product { Name = "Хлеб", Category = cat1, CreatedById = admin.Id };
-        var p2 = new Product { Name = "Молоко", Category = cat1, CreatedById = user.Id };
-        var p3 = new Product { Name = "Мыло", Category = cat2, CreatedById = user.Id };
-
+        // --- РўРѕРІР°СЂС‹ ---
+        var p1 = new Product { Name = "РҐР»РµР±", Category = cat1, CreatedById = admin.Id };
+        var p2 = new Product { Name = "РњРѕР»РѕРєРѕ", Category = cat1, CreatedById = user.Id };
+        var p3 = new Product { Name = "РњС‹Р»Рѕ", Category = cat2, CreatedById = user.Id };
         context.Products.AddRange(p1, p2, p3);
         context.SaveChanges();
+
+        // --- РЎРїРёСЃРєРё РїРѕРєСѓРїРѕРє ---
+        var list1 = new ShoppingList
+        {
+            Name = "РЎРїРёСЃРѕРє РЅР° РІС‹С…РѕРґРЅС‹Рµ",
+            OwnerId = admin.Id,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        var list2 = new ShoppingList
+        {
+            Name = "Р”РµРЅСЊ СЂРѕР¶РґРµРЅРёСЏ",
+            OwnerId = user.Id,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        context.ShoppingLists.AddRange(list1, list2);
+        context.SaveChanges();
+
+        // --- Р­Р»РµРјРµРЅС‚С‹ СЃРїРёСЃРєРѕРІ ---
+        context.ListItems.AddRange(
+            new ListItem { List = list1, Product = p1, Quantity = 2, IsBought = false },
+            new ListItem { List = list1, Product = p3, Quantity = 1, IsBought = true },
+            new ListItem { List = list2, Product = p2, Quantity = 3, IsBought = false }
+           );
+        context.SaveChanges();
+
+        // --- РЎРѕРІРјРµСЃС‚РЅС‹Р№ РґРѕСЃС‚СѓРї ---
+        context.SharedAccesses.Add(new SharedAccess
+        {
+            List = list2,
+            User = admin,
+            Status = "Accepted"
+        });
+
+        context.SaveChanges();
     }
+
 }
