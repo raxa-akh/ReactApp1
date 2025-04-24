@@ -12,15 +12,16 @@ interface ShoppingList {
 export default function MyListsPage() {
     const token = useSelector((state: RootState) => state.auth.token);
     const [lists, setLists] = useState<ShoppingList[]>([]);
+    const [newListName, setNewListName] = useState('');
     const navigate = useNavigate();
 
     const handleCreate = async () => {
-        if (!token) return;
+        if (!token || !newListName.trim()) return;
 
         try {
             const res = await axios.post(
                 '/api/shoppinglist',
-                { name: 'Новый список' },
+                { name: newListName },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -28,12 +29,12 @@ export default function MyListsPage() {
                 }
             );
             const newListId = res.data.id;
+            setNewListName(''); 
             navigate(`/list/${newListId}`);
         } catch (err) {
             console.error('Ошибка при создании списка:', err);
         }
     };
-
 
     useEffect(() => {
         if (!token) return;
@@ -54,8 +55,16 @@ export default function MyListsPage() {
 
     return (
         <div>
-            <button onClick={handleCreate}>Создать новый список</button>
             <h2>Мои списки</h2>
+
+            <input
+                type="text"
+                placeholder="Введите название списка"
+                value={newListName}
+                onChange={(e) => setNewListName(e.target.value)}
+            />
+            <button onClick={handleCreate}>Создать список</button>
+
             {lists.length === 0 && <p>У вас пока нет списков</p>}
             <ul>
                 {lists.map((list) => (

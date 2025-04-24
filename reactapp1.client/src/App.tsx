@@ -4,6 +4,8 @@ import LoginPage from './pages/LoginPage';
 import Layout from './layout/Layout';
 import ListEditorPage from './pages/ListEditorPage';
 import MyListsPage from './pages/MyListsPage';
+import SharedListsPage from './pages/SharedListsPage';
+
 
 function App() {
     return (
@@ -37,6 +39,12 @@ function App() {
                     }
                 />
                 
+                <Route path="/shared"
+                    element={
+                        <Layout>
+                            <SharedListsPage />
+                        </Layout>
+                } />
 
 
             </Routes>
