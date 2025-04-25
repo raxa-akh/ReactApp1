@@ -1,4 +1,4 @@
-﻿import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { logout } from '@/store/slices/authSlice';
 import { Link, useNavigate } from 'react-router-dom';
@@ -16,7 +16,7 @@ export default function Header() {
     return (
         <header style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>
             <h2 style={{ display: 'inline-block', marginRight: 20 }}>
-                <Link to="/">🛒 Shopping App</Link>
+                <Link to="/">Shopping App</Link>
             </h2>
 
             {token ? (
