@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { login } from '@/store/slices/authSlice';
@@ -22,6 +22,10 @@ export default function LoginPage() {
         }
     };
 
+    const handleRegister = async () => {
+        navigate('/register')
+    };
+
     return (
         <div>
             <h2>Вход Enter</h2>
@@ -29,6 +33,7 @@ export default function LoginPage() {
             <input placeholder="Name" value={username} onChange={e => setUsername(e.target.value)} />
             <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
             <button onClick={handleLogin}>Войти</button>
+            <button onClick={handleRegister}>Зарегестрироваться</button>
         </div>
     );
 }

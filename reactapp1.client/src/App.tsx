@@ -5,6 +5,7 @@ import Layout from './layout/Layout';
 import ListEditorPage from './pages/ListEditorPage';
 import MyListsPage from './pages/MyListsPage';
 import SharedListsPage from './pages/SharedListsPage';
+import RegisterPage from "./pages/RegisterPage"
 
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
         <BrowserRouter>
             <Routes>
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage/>} />
 
                 <Route
                     path="/"
