@@ -101,6 +101,7 @@ public class ShoppingListController : ControllerBase
             Id = list.Id,
             Name = list.Name,
             CreatedAt = list.CreatedAt,
+            OwnerId = list.OwnerId,
             Items = list.Items.Select(i => new ListItemDto
             {
                 Id = i.Id,

@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
+import * as signalR from '@microsoft/signalr';
 
 interface Product {
     id: number;
@@ -20,12 +21,15 @@ interface ListItem {
 interface ShoppingList {
     id: number;
     name: string;
+    createdAt: string;
+    ownerId: number;    
     items: ListItem[];
 }
 
 export default function ListEditorPage() {
     const { id } = useParams<{ id: string }>();
     const token = useSelector((state: RootState) => state.auth.token);
+    const userId = useSelector((state: RootState) => state.auth.userId);
     const [list, setList] = useState<ShoppingList | null>(null);
 
     const [newItemName, setNewItemName] = useState('');
@@ -38,33 +42,74 @@ export default function ListEditorPage() {
 
     const [sharedUsers, setSharedUsers] = useState<{ id: number; username: string }[]>([]);
     const [newUsername, setNewUsername] = useState('');
+    const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
+
+    
 
 
 
+    const fetchShared = async () => {
+        if (!id || !token) return;
+        axios.get(`/api/shoppinglist/${id}/access`, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+            .then(res => setSharedUsers(res.data))
+            .catch(err => console.error('Ошибка загрузки доступов:', err));
+    };
+
+    const fetchList = async () => {
+        if (!id || !token) return;
+        const res = await axios.get(`/api/shoppinglist/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        setList(res.data);
+    };
+
+    useEffect(() => {
+        if (!id || !token) return;
+
+        const newConnection = new signalR.HubConnectionBuilder()
+            .withUrl("https://localhost:7013/hubs/list", { accessTokenFactory: () => token })
+            .withAutomaticReconnect()
+            .build();
+
+        newConnection.start()
+            .then(() => {
+                console.log('SignalR Connected.');
+                newConnection.invoke('JoinListGroup', Number(id));
+
+                newConnection.on('ListUpdated', async (listId: number) => {
+                    if (Number(id) === listId) {
+                        console.log('List updated');
+                        fetchList();
+                    }
+                });
+
+                setConnection(newConnection);
+            })
+            .catch(e => console.error('SignalR error:', e));
+
+        fetchList();
+        fetchShared();
+
+        return () => {
+            newConnection.stop();
+        };
+    }, [id, token]);
+
+    if (!list) return <p>Загрузка...</p>;
+    const isOwner = list?.ownerId === userId;
     const handleAddItem = async () => {
         if (!token || !list || newItemName.trim() === '') return;
-
-        try {
-            await axios.post('/api/listitem', {
-                listId: list.id,
-                customName: newItemName,
-                quantity,
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            
-            const res = await axios.get(`/api/shoppinglist/${list.id}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setList(res.data);
-            setNewItemName('');
-            setQuantity(1);
-        } catch (err) {
-            console.error('Ошибка добавления товара:', err);
-        }
+        await axios.post('/api/listitem', {
+            listId: list.id,
+            customName: newItemName,
+            quantity,
+        }, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        setNewItemName('');
+        setQuantity(1);
     };
 
     const openEditDialog = (item: ListItem) => {
@@ -74,133 +119,61 @@ export default function ListEditorPage() {
         dialogRef.current?.showModal();
     };
 
-    const fetchShared = async () => {
-        if (!id || !token) return;
-
-        axios.get(`/api/shoppinglist/${id}/access`, {
+    const saveEdit = async () => {
+        if (!token || !list || !editItem) return;
+        await axios.put(`/api/listitem/${editItem.id}`, {
+            id: editItem.id,
+            listId: list.id,
+            quantity: editQty,
+            isBought: editItem.isBought,
+            customName: editName
+        }, {
             headers: { Authorization: `Bearer ${token}` }
-        })
-            .then(res => setSharedUsers(res.data))
-            .catch(err => console.error('Ошибка загрузки доступов:', err));
-    }
+        });
 
-
-    useEffect(() => {
-        if (!id || !token) return;
-        fetchShared();
-
-        axios.get(`/api/shoppinglist/${id}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        }).then((res) => setList(res.data))
-            .catch(err => console.error('Ошибка загрузки списка:', err));
-    }, [id, token]);
-
-    if (!list) return <p>Загрузка...</p>;
-
+        dialogRef.current?.close();
+        setEditItem(null);
+    };
 
     const toggleBought = async (itemId: number) => {
         if (!list || !token) return;
-
         const item = list.items.find(i => i.id === itemId);
         if (!item) return;
 
-        try {
-            await axios.put(`/api/listitem/${itemId}`, {
-                id: item.id,
-                quantity: item.quantity,
-                isBought: !item.isBought,
-                customName: item.customName
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            
-            const res = await axios.get(`/api/shoppinglist/${list.id}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setList(res.data);
-        } catch (err) {
-            console.error('Ошибка при переключении:', err);
-        }
+        await axios.put(`/api/listitem/${itemId}`, {
+            id: item.id,
+            quantity: item.quantity,
+            isBought: !item.isBought,
+            customName: item.customName
+        }, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
     };
-
 
     const deleteItem = async (itemId: number) => {
-        try {
-            await axios.delete(`/api/listitem/${itemId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            const res = await axios.get(`/api/shoppinglist/${list?.id}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setList(res.data);
-        } catch (err) {
-            console.error('Ошибка при удалении:', err);
-        }
+        await axios.delete(`/api/listitem/${itemId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
     };
 
-    const saveEdit = async () => {
-        if (!token || !list || !editItem) return;
-
-        try {
-            await axios.put(`/api/listitem/${editItem.id}`, {
-                id: editItem.id,
-                listId: list.id,
-                quantity: editQty,
-                isBought: editItem.isBought,
-                customName: editName
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            const res = await axios.get(`/api/shoppinglist/${list.id}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setList(res.data);
-            dialogRef.current?.close();
-        } catch (err) {
-            console.error('Ошибка при обновлении:', err);
-        }
-    };
-
-    
     const handleShare = async () => {
         if (!newUsername.trim() || !id) return;
-
-        try {
-            await axios.post(`/api/shoppinglist/${id}/access`, {
-                targetUsername: newUsername
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            setNewUsername('');
-            fetchShared();
-        } catch (err) {
-            console.error('Ошибка при предоставлении доступа:', err);
-        }
+        await axios.post(`/api/shoppinglist/${id}/access`, {
+            targetUsername: newUsername
+        }, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        setNewUsername('');
+        fetchShared();
     };
-
-
 
     const handleRevoke = async (accessId: number) => {
         if (!id) return;
-
-        try {
-            await axios.delete(`/api/shoppinglist/${id}/access/${accessId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            fetchShared();
-        } catch (err) {
-            console.error('Ошибка при удалении доступа:', err);
-        }
+        await axios.delete(`/api/shoppinglist/${id}/access/${accessId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        fetchShared();
     };
-
-
-
 
     return (
         <div>
@@ -229,35 +202,36 @@ export default function ListEditorPage() {
                         <button onClick={() => toggleBought(item.id)}>✔✖</button>
                         <button onClick={() => deleteItem(item.id)}>Удалить</button>
                         <button onClick={() => openEditDialog(item)}>Редактировать</button>
-                        
                     </li>
                 ))}
             </ul>
 
             <hr />
-            <h3>Совместный доступ</h3>
+            {isOwner && (
+                <>
+                    <h3>Совместный доступ</h3>
 
-            <input
-                placeholder="Имя пользователя"
-                value={newUsername}
-                onChange={(e) => setNewUsername(e.target.value)}
-            />
-            <button onClick={handleShare}>Предоставить доступ</button>
+                    <input
+                        placeholder="Имя пользователя"
+                        value={newUsername}
+                        onChange={(e) => setNewUsername(e.target.value)}
+                    />
+                    <button onClick={handleShare}>Предоставить доступ</button>
 
-            <ul>
-                {sharedUsers.map(user => (
-                    <li key={user.id}>
-                        {user.username}
-                        <button onClick={() => handleRevoke(user.id)}>Удалить</button>
-                    </li>
-                ))}
-            </ul>
-
+                    <ul>
+                        {sharedUsers.map(user => (
+                            <li key={user.id}>
+                                {user.username}
+                                <button onClick={() => handleRevoke(user.id)}>Удалить</button>
+                            </li>
+                        ))}
+                    </ul>
+                </>
+            )}
 
             <dialog ref={dialogRef}>
                 <form method="dialog" onSubmit={(e) => { e.preventDefault(); saveEdit(); }}>
                     <h3>Редактировать товар</h3>
-
                     <label>
                         Название:
                         <input
@@ -267,7 +241,6 @@ export default function ListEditorPage() {
                         />
                     </label>
                     <br />
-
                     <label>
                         Количество:
                         <input
@@ -278,7 +251,6 @@ export default function ListEditorPage() {
                         />
                     </label>
                     <br />
-
                     <menu>
                         <button type="submit">Сохранить</button>
                         <button type="button" onClick={() => dialogRef.current?.close()}>
@@ -287,7 +259,6 @@ export default function ListEditorPage() {
                     </menu>
                 </form>
             </dialog>
-
         </div>
     );
 }

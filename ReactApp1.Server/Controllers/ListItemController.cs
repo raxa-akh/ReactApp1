@@ -2,9 +2,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReactApp1.Server.Models.Dtos;
 using ReactApp1.Server.Models;
-using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.SignalR;
+using ReactApp1.Server.Hubs;
+using System.Security.Claims;
 
 [Authorize]
 [Route("api/[controller]")]
@@ -12,10 +13,12 @@ using Microsoft.EntityFrameworkCore;
 public class ListItemController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly IHubContext<ShoppingListHub> _hubContext;
 
-    public ListItemController(AppDbContext context)
+    public ListItemController(AppDbContext context, IHubContext<ShoppingListHub> hubContext)
     {
         _context = context;
+        _hubContext = hubContext;
     }
 
     [HttpGet("{listId}")]
@@ -62,11 +65,10 @@ public class ListItemController : ControllerBase
         _context.ListItems.Add(item);
         await _context.SaveChangesAsync();
 
+        await _hubContext.Clients.Group($"list-{dto.ListId}").SendAsync("ListUpdated", dto.ListId);
+
         return Ok(new { item.Id });
     }
-
-
-
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateItem(int id, [FromBody] ListItemUpdateDto dto)
@@ -89,10 +91,11 @@ public class ListItemController : ControllerBase
         item.CustomName = dto.CustomName;
 
         await _context.SaveChangesAsync();
+
+        await _hubContext.Clients.Group($"list-{item.ListId}").SendAsync("ListUpdated", item.ListId);
+
         return NoContent();
     }
-
-
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteItem(int id)
@@ -111,9 +114,10 @@ public class ListItemController : ControllerBase
         _context.ListItems.Remove(item);
         await _context.SaveChangesAsync();
 
+        await _hubContext.Clients.Group($"list-{item.ListId}").SendAsync("ListUpdated", item.ListId);
+
         return NoContent();
     }
-
 
     private async Task<bool> HasAccessToList(int listId, int userId)
     {
@@ -123,5 +127,4 @@ public class ListItemController : ControllerBase
                 l.Id == listId &&
                 (l.OwnerId == userId || l.SharedUsers.Any(sa => sa.UserId == userId)));
     }
-
 }
