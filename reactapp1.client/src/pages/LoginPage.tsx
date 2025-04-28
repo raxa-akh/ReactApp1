@@ -14,8 +14,8 @@ export default function LoginPage() {
     const handleLogin = async () => {
         try {
             const response = await axios.post('/api/auth/login', { username, password });
-            const { token, username: name, role } = response.data;
-            dispatch(login({ token, username: name, role }));
+            const { token, username: name, role, userId } = response.data;
+            dispatch(login({ token, username: name, role, userId }));
             navigate('/');
         } catch {
             setError('ошибка');
