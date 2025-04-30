@@ -6,7 +6,7 @@ import ListEditorPage from './pages/ListEditorPage';
 import MyListsPage from './pages/MyListsPage';
 import SharedListsPage from './pages/SharedListsPage';
 import RegisterPage from "./pages/RegisterPage"
-
+import "./App.css"
 
 function App() {
     return (

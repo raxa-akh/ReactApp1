@@ -1,0 +1,113 @@
+.container{
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    
+    display:  flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cardContainer {
+    perspective: 1000px;
+    width: 400px;
+    height: auto;
+    margin: auto;
+    margin-top: 100px;
+    color: var(--main-color)
+
+}
+
+.card {
+    width: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.8s;
+    position: relative;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.front, .back {
+    backface-visibility: hidden;
+    position: absolute;
+    width: 100%;
+    padding: 20px;
+    background: white;
+    border: 1px solid var(--purple-color);
+    border-radius: 10px;
+    background-color: var(--purple-color);
+    
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .front {
+    z-index: 2;
+  }
+  
+  .back {
+    transform: rotateY(180deg);
+  }
+
+ 
+  
+ .flipped {
+    transform: rotateY(180deg);
+  }
+  
+
+  .input{
+    width: 100%;
+    height: 40px;
+    border-radius: 15px;
+    padding-left: 10px;
+    border: none;
+    /* background-color: var(--second-color) */
+  }
+
+  .input:focus{
+    border: none;
+    outline: none;
+    transition: all 0.1s linear;
+    transform: scale(1.05);
+  }
+
+  .mainBtn{
+    border-radius: 15px;
+    background-color: var(--main-color);
+    padding: 10px 20px;
+    cursor: pointer;
+    border: 1px solid var(--main-color);
+    transition: all 0.2s linear;
+  }
+
+  .mainBtn:hover{
+    background-color: var(--purple-color);
+    color: var(--main-color);
+    border: 1px solid var(--main-color);
+  }
+
+  .title{
+    font-size: 26px;
+    font-weight: 600;
+
+  }
+
+  .secondBtn{
+    background-color: transparent;
+    border: none;
+    color: var(--main-color);
+    text-decoration: underline;
+    cursor: pointer;
+    transition: all 0.2s linear;
+  }
+
+  .secondBtn:hover{
+    text-decoration: none;
+  }

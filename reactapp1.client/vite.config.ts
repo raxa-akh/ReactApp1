@@ -29,7 +29,7 @@ if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
     }
 }
 
-const target = 'https://localhost:7013';
+const target = 'http://localhost:7013';
 
 export default defineConfig({
     plugins: [plugin()],

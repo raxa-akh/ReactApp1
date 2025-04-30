@@ -1,11 +1,24 @@
-﻿#root {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 2rem;
-    text-align: center;
+* {
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    box-sizing: border-box;
 }
 
-th, td {
-    padding-left: 1rem;
-    padding-right: 1rem;
+body{
+    background-color: var(--second-color);
+}
+
+:root {
+    --main-color: #fff;
+    --second-color: #1d1c1c;
+    --black-color: rgb(0, 0, 0);
+    --dark--grey-color: rgb(119, 118, 118);
+    --purple-color: #37139b;
+}
+
+.darkMode {
+    --main-color: #000;
+    --second-color: #fff;
+    --grey-color: rgb(90, 90, 90);
 }
