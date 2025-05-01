@@ -77,22 +77,7 @@
     transition: all 0.1s linear;
     transform: scale(1.05);
   }
-
-  .mainBtn{
-    border-radius: 15px;
-    background-color: var(--main-color);
-    padding: 10px 20px;
-    cursor: pointer;
-    border: 1px solid var(--main-color);
-    transition: all 0.2s linear;
-  }
-
-  .mainBtn:hover{
-    background-color: var(--purple-color);
-    color: var(--main-color);
-    border: 1px solid var(--main-color);
-  }
-
+  
   .title{
     font-size: 26px;
     font-weight: 600;

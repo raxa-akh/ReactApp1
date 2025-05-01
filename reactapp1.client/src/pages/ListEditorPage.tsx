@@ -31,7 +31,6 @@ export default function ListEditorPage() {
     const token = useSelector((state: RootState) => state.auth.token);
     const userId = useSelector((state: RootState) => state.auth.userId);
     const [list, setList] = useState<ShoppingList | null>(null);
-    console.log(userId)
     const [newItemName, setNewItemName] = useState('');
     const [quantity, setQuantity] = useState(1);
 

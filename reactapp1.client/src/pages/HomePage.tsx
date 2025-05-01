@@ -1,7 +1,8 @@
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { useNavigate } from 'react-router-dom';
-
+import cls from "@/styles/HomePage.module.css"
+import Button from '@/components/button/Button';
 export default function HomePage() {
     const token = useSelector((state: RootState) => state.auth.token);
     const navigate = useNavigate();
@@ -12,7 +13,6 @@ export default function HomePage() {
             return;
         }
 
-        console.log('Мои списки');
         navigate('/my-lists'); 
     };
 
@@ -27,10 +27,12 @@ export default function HomePage() {
     };
 
     return (
-        <div>
-            <h1>Добро пожаловать!</h1>
-            <button onClick={() => handleCreateList()}>Мои списки</button>
-            <button onClick={() => handleCheckOtherLists()}>Чужие списки</button>
+        <div className={cls.container}>
+            <span className={cls.title}>Добро пожаловать!</span>
+            <div className={cls.inner}>
+                <Button onClick={() => handleCreateList()} text="Мои списки"/>
+                <Button onClick={() => handleCheckOtherLists()} text="Другие списки"/>
+            </div>
         </div>
     );
 }

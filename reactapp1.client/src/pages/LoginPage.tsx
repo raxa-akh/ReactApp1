@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { login } from '@/store/slices/authSlice';
 import { useNavigate } from 'react-router-dom';
 import styles from "@/styles/LoginPage.module.css"
-
+import Button from '../components/button/Button';
 export default function LoginPage() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -85,7 +85,7 @@ export default function LoginPage() {
                             <span className={styles.title}>Вход</span>
                             <input className={styles.input} type="text" placeholder="Логин" required value={username} onChange={(e) => setUsername(e.target.value)} />
                             <input className={styles.input} type="password" placeholder="Пароль" required value={password} onChange={(e) => setPassword(e.target.value)}/>
-                            <button className={styles.mainBtn} onClick={() => {handleLogin()}}>Войти</button>
+                            <Button onClick={() => handleLogin()} text="Войти"/>
                             {error && <p className={styles.error}>{error}</p>}
                             <button className={styles.secondBtn} onClick={() => flipCard()}>Нет аккаунта? Зарегистрироваться</button>
                         </div>

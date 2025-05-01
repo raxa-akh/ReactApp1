@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import child_process from 'child_process';
 import { env } from 'process';
-
+import svgr from 'vite-plugin-svgr';
 const baseFolder =
     env.APPDATA !== undefined && env.APPDATA !== ''
         ? `${env.APPDATA}/ASP.NET/https`
@@ -29,10 +29,13 @@ if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
     }
 }
 
-const target = 'http://localhost:7013';
+const target = 'https://localhost:7013';
 
 export default defineConfig({
-    plugins: [plugin()],
+    plugins: [
+        plugin(),
+        svgr()
+    ],
     resolve: {
         alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url))

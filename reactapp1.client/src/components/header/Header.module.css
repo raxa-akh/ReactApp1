@@ -1,0 +1,48 @@
+.header{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--main-color);
+}   
+
+.logo a{
+    font-size: 25px;
+    color: var(--main-color);
+    text-decoration: none;
+    transition: all 0.2s linear;
+}
+
+.logo:hover a{
+    text-decoration: underline red;;
+}
+
+.logo a span{
+    font-size: 25px;
+    color: red;
+    transition: all 0.2s linear;
+}
+
+.logo:hover a span{
+    text-decoration: underline var(--main-color);
+}
+
+.inner{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.logout{
+    background-color: red;
+    padding: 5px;
+    border-radius: 5px;
+    border: none;
+    cursor :pointer;
+    transition: all 0.2s linear;
+}
+
+.logout:hover{
+    transform: scale(1.1);
+}

@@ -36,6 +36,25 @@ export default function MyListsPage() {
         }
     };
 
+    const handleDelete = async (id : number) => {
+        if (!token) return;
+
+        try {
+            await axios.delete(
+                `/api/shoppinglist/${id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            
+            setLists(lists.filter((e) => e.id !== id))
+        } catch (err) {
+            console.error('Ошибка при создании списка:', err);
+        }
+    }
+
     useEffect(() => {
         if (!token) return;
 
@@ -47,8 +66,8 @@ export default function MyListsPage() {
             })
             .then((res) => setLists(res.data))
             .catch((err) => console.error('Ошибка загрузки списков:', err));
-    }, [token]);
-
+        }, [token]);
+        
     const handleOpen = (id: number) => {
         navigate(`/list/${id}`);
     };
@@ -71,6 +90,7 @@ export default function MyListsPage() {
                     <li key={list.id}>
                         {list.name}{' '}
                         <button onClick={() => handleOpen(list.id)}>Открыть</button>
+                        <button onClick={() => handleDelete(list.id)}>Удалить</button>
                     </li>
                 ))}
             </ul>

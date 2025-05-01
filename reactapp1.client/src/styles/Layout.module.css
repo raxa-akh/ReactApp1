@@ -1,0 +1,23 @@
+.container{
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.inner{
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    flex-direction: column ;
+
+    background-color: var(--purple-color);
+    color: var(--main-color);
+    padding: 20px 20px;
+    border-radius: 20px;
+
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+}
