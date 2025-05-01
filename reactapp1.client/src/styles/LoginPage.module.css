@@ -111,3 +111,7 @@
   .secondBtn:hover{
     text-decoration: none;
   }
+
+  .error{
+      color: red;
+  }

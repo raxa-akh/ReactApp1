@@ -10,7 +10,7 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
+    const [error, setError] = useState<string | null>('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -18,8 +18,19 @@ export default function LoginPage() {
 
     const flipCard = () =>{
         setFlipped(!flipped)
+        setError(null);
     }
     const handleLogin = async () => {
+
+        if (username === "") {
+            setError('Введите имя');
+            return;
+        }
+
+        if (password === "") {
+            setError('Введите пароль');
+            return;
+        }
         try {
             const response = await axios.post('/api/auth/login', { username, password });
             const { token, username: name, role, userId } = response.data;
@@ -37,6 +48,15 @@ export default function LoginPage() {
             setError('Пароли не совпадают');
             return;
         }
+        if (username === "") {
+            setError('Введите имя');
+            return;
+        }
+
+        if (email === "") {
+            setError('Введите почту');
+            return;
+        }
 
         try {
             await axios.post('/api/auth/register', {
@@ -44,8 +64,11 @@ export default function LoginPage() {
                 email,
                 password
             });
-
-            navigate('/login'); 
+            setUsername("");
+            setPassword("");
+            setEmail("");
+            setConfirmPassword("");
+            setFlipped(false);
         } catch (err: any) {
             console.error(err);
             setError(err.response?.data || 'Ошибка регистрации');
@@ -68,9 +91,10 @@ export default function LoginPage() {
                         </div>
                         <div className={styles.back}>
                             <span className={styles.title}>Регистрация</span>
-                            <input className={styles.input} type="text" placeholder="Имя" required />
-                            <input className={styles.input} type="email" placeholder="Email" required />
-                            <input className={styles.input} type="password" placeholder="Пароль" required />
+                            <input className={styles.input} type="text" placeholder="Имя" required value={username} onChange={(e) => setUsername(e.target.value)} />
+                            <input className={styles.input} type="email" placeholder="Email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                            <input className={styles.input} type="password" placeholder="Пароль" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                            <input className={styles.input} type="password" placeholder="Повторите пароль" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
                             <button className={styles.mainBtn} onClick={() => {handleRegister()}} >Зарегистрироваться</button>
                             {error && <p className={styles.error}>{error}</p>}
                             <button className={styles.secondBtn} onClick={() => flipCard()}>Уже есть аккаунт? Войти</button>
