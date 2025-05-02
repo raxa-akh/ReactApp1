@@ -1,0 +1,47 @@
+.container{
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 15px;
+
+    position: relative;
+}
+
+.title{
+    font-size: 25px;
+}
+
+.newList{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.newListInner{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.listItem{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.listName{
+    font-style: italic;
+}
+
+.listsTitle{
+    font-size: 18px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.buttons{
+    display: flex;
+    gap: 10px;
+}

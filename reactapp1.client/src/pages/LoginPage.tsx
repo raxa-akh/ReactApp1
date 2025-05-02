@@ -5,6 +5,7 @@ import { login } from '@/store/slices/authSlice';
 import { useNavigate } from 'react-router-dom';
 import styles from "@/styles/LoginPage.module.css"
 import Button from '../components/button/Button';
+import Input from '@/components/input/Input';
 export default function LoginPage() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -83,18 +84,18 @@ export default function LoginPage() {
                     <div className={`${styles.card} ${flipped ? styles.flipped : ""}`} id="card">
                         <div className={styles.front}>
                             <span className={styles.title}>Вход</span>
-                            <input className={styles.input} type="text" placeholder="Логин" required value={username} onChange={(e) => setUsername(e.target.value)} />
-                            <input className={styles.input} type="password" placeholder="Пароль" required value={password} onChange={(e) => setPassword(e.target.value)}/>
+                            <Input type="text" placeholder='Логин' value={username} onChange={(e) => setUsername(e.target.value)}/>
+                            <Input type="password" placeholder="Пароль"  value={password} onChange={(e) => setPassword(e.target.value)}/>
                             <Button onClick={() => handleLogin()} text="Войти"/>
                             {error && <p className={styles.error}>{error}</p>}
                             <button className={styles.secondBtn} onClick={() => flipCard()}>Нет аккаунта? Зарегистрироваться</button>
                         </div>
                         <div className={styles.back}>
                             <span className={styles.title}>Регистрация</span>
-                            <input className={styles.input} type="text" placeholder="Имя" required value={username} onChange={(e) => setUsername(e.target.value)} />
-                            <input className={styles.input} type="email" placeholder="Email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-                            <input className={styles.input} type="password" placeholder="Пароль" required value={password} onChange={(e) => setPassword(e.target.value)} />
-                            <input className={styles.input} type="password" placeholder="Повторите пароль" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                            <input className={styles.input} type="text" placeholder="Имя"  value={username} onChange={(e) => setUsername(e.target.value)} />
+                            <input className={styles.input} type="email" placeholder="Email"  value={email} onChange={(e) => setEmail(e.target.value)} />
+                            <input className={styles.input} type="password" placeholder="Пароль"  value={password} onChange={(e) => setPassword(e.target.value)} />
+                            <input className={styles.input} type="password" placeholder="Повторите пароль"  value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
                             <button className={styles.mainBtn} onClick={() => {handleRegister()}} >Зарегистрироваться</button>
                             {error && <p className={styles.error}>{error}</p>}
                             <button className={styles.secondBtn} onClick={() => flipCard()}>Уже есть аккаунт? Войти</button>

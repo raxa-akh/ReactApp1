@@ -1,0 +1,114 @@
+.container{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+}
+
+.title{
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--main-color);
+
+    display: block;
+    margin-bottom: 20px;
+}
+
+.createCont{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.inputCont{
+    display: flex;
+    gap: 10px;
+}
+
+.listItem, .listItemAdd{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.listItemAdd{
+    justify-content: flex-start;
+    gap: 15px;
+}
+
+.listItemName{
+    font-style: italic;
+}
+
+.btnCont{
+    display: flex;
+    gap: 5px;
+}
+
+.hr{
+    margin: 20px 0;
+}
+
+.toggleBtn{
+    color: var(--main-color);
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s linear;
+}
+
+.toggleBtn:hover{
+    transform: scale(1.1);
+}
+
+.sharedCont{
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+}
+
+.sharedInner{
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   
+   margin-bottom: 15px;
+}
+
+.modal{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--purple-color);
+
+    border: none;
+    border-radius: 20px;
+    padding: 20px;
+    width: 450px;
+}
+
+.modal::backdrop {
+    background: rgba(0, 0, 0, 0.6); 
+  }
+  
+.form{
+    display: flex;
+    gap: 15px;
+    flex-direction: column;
+}  
+
+.inputs{
+    display: flex;
+    gap: 10px;
+}
+
+.buttons{
+    display: flex;
+    gap: 10px;
+}

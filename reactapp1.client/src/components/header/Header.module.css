@@ -46,3 +46,7 @@
 .logout:hover{
     transform: scale(1.1);
 }
+
+.hello span{
+    font-style: italic  ;
+}

@@ -4,6 +4,10 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import * as signalR from '@microsoft/signalr';
+import cls from "@/styles/ListEditorPage.module.css"
+import Input from '@/components/input/Input';
+import Button from '@/components/button/Button';
+import Navigation from '@/components/navigation/Navigation';
 
 interface Product {
     id: number;
@@ -175,89 +179,98 @@ export default function ListEditorPage() {
     };
 
     return (
-        <div>
-            <h2>{list.name}</h2>
+        <div className={cls.container}>
+            <span className={cls.title}>{list.name}</span>
 
-            <div>
-                <input
-                    placeholder="Товар"
-                    value={newItemName}
-                    onChange={(e) => setNewItemName(e.target.value)}
-                />
-                <input
-                    type="number"
-                    min={1}
-                    value={quantity}
-                    onChange={(e) => setQuantity(Number(e.target.value))}
-                />
-                <button onClick={handleAddItem}>Добавить</button>
+            <div className={cls.createCont}>
+                <div className={cls.inputCont}>
+                    <Input 
+                        placeholder="Товар"
+                        type="text"
+                        value={newItemName}
+                        onChange={(e) => setNewItemName(e.target.value)}
+                        width={"200px"}
+                        />
+                    
+                    <Input
+                        type="number"
+                        min={1}
+                        value={quantity}
+                        onChange={(e) => setQuantity(Number(e.target.value))}
+                        width={"60px"}
+                    />
+                </div>
+                <Button success={true} text="Добавить" onClick={() => handleAddItem()}/>
             </div>
 
             <ul>
                 {list.items.map(item => (
-                    <li key={item.id}>
-                        {item.product?.name || item.customName} – {item.quantity} шт –
-                        <strong> {item.isBought ? '✔ Куплено' : '❌ Не куплено'}</strong>
-                        <button onClick={() => toggleBought(item.id)}>✔✖</button>
-                        <button onClick={() => deleteItem(item.id)}>Удалить</button>
-                        <button onClick={() => openEditDialog(item)}>Редактировать</button>
+                    <li className={cls.listItem} key={item.id}>
+                        <span className={cls.listItemName}>{item.product?.name || item.customName} – {item.quantity} шт </span>
+                        {/* <strong> {item.isBought ? '✔ Куплено' : '❌ Не куплено'}</strong> */}
+                        <div className={cls.btnCont}>
+                            <button style={{backgroundColor: item.isBought ? "green" : "red"}} className={cls.toggleBtn} onClick={() => toggleBought(item.id)}>{item.isBought ? "✔" : "✖"}</button>
+                            <Button error={true} onClick={() => deleteItem(item.id)}  text="Удалить"/>
+                            <Button onClick={() => openEditDialog(item)} text="Редактировать"/>
+                        </div>
                     </li>
                 ))}
             </ul>
 
-            <hr />
+            { isOwner && <hr className={cls.hr}/>}
             {isOwner && (
                 <>
-                    <h3>Совместный доступ</h3>
+                    <span className={cls.title}>Совместный доступ</span>
+                    <div className={cls.sharedCont}>
+                        <div className={cls.sharedInner}>
+                            <Input
+                                placeholder="Имя пользователя"
+                                value={newUsername}
+                                onChange={(e) => setNewUsername(e.target.value)}
+                                width={"300"}
+                            />
+                            <Button onClick={() => handleShare()} text="Поделиться"/>
+                        </div>
 
-                    <input
-                        placeholder="Имя пользователя"
-                        value={newUsername}
-                        onChange={(e) => setNewUsername(e.target.value)}
-                    />
-                    <button onClick={handleShare}>Предоставить доступ</button>
-
-                    <ul>
-                        {sharedUsers.map(user => (
-                            <li key={user.id}>
-                                {user.username}
-                                <button onClick={() => handleRevoke(user.id)}>Удалить</button>
-                            </li>
-                        ))}
-                    </ul>
+                        <ul>
+                            {sharedUsers.map(user => (
+                                <li className={cls.listItemAdd} key={user.id}>
+                                    <span className={cls.listItemName}>{user.username}</span>
+                                    <Button error={true} text="Удалить" onClick={() => handleRevoke(user.id)} />
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                 </>
             )}
 
-            <dialog ref={dialogRef}>
-                <form method="dialog" onSubmit={(e) => { e.preventDefault(); saveEdit(); }}>
-                    <h3>Редактировать товар</h3>
-                    <label>
-                        Название:
-                        <input
+            <dialog className={cls.modal}  ref={dialogRef}>
+                <div className={cls.form}>
+                    <span className={cls.title}>Редактировать товар</span>
+                    <div className={cls.inputs}>
+                        <Input
                             type="text"
                             value={editName}
                             onChange={(e) => setEditName(e.target.value)}
+                            width='300px'
                         />
-                    </label>
-                    <br />
-                    <label>
-                        Количество:
-                        <input
+                        <Input
                             type="number"
                             min={1}
                             value={editQty}
                             onChange={(e) => setEditQty(Number(e.target.value))}
+                            width='60px'
                         />
-                    </label>
-                    <br />
-                    <menu>
-                        <button type="submit">Сохранить</button>
-                        <button type="button" onClick={() => dialogRef.current?.close()}>
-                            Отмена
-                        </button>
+                    </div>
+                    
+                    <menu className={cls.buttons}>
+                        <Button success={true} text="Сохранить" onClick={() => {saveEdit()}}/>
+                        <Button error={true} onClick={() => dialogRef.current?.close()} text="Отмена"/>
                     </menu>
-                </form>
+                </div>
             </dialog>
+
+            <Navigation/>
         </div>
     );
 }

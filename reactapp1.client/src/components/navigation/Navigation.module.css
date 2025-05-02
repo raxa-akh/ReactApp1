@@ -1,0 +1,21 @@
+.arrows{
+    position: absolute;
+    top: 2%;
+    right: 0%;
+    display: flex;
+    gap: 5px;
+}
+
+.arrowBtn{
+    background-color: var(--main-color);
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 5px;
+    height: 30px;
+    transition: all 0.2s linear;
+}
+
+.arrowBtn:hover{
+    transform: rotate(360deg);
+    
+}

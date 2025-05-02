@@ -22,7 +22,7 @@ export default function Header() {
             <div className={cls.inner}>
                 {token ? (
                     <>
-                        <span>Привет, {username}!</span>
+                        <span className={cls.hello}>Привет, <span>{username}</span>!</span>
                         <button onClick={() => handleLogout()} className={cls.logout}><LogoutSVG style={{width: "20px"}}/></button>
                     </>
                 ) : (

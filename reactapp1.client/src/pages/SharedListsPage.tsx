@@ -3,6 +3,9 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { useNavigate } from 'react-router-dom';
+import cls from "@/styles/SharedListsPage.module.css"
+import Button from '@/components/button/Button';
+import Navigation from '@/components/navigation/Navigation';
 
 interface ListItem {
     id: number;
@@ -41,20 +44,25 @@ export default function SharedListsPage() {
     };
 
     return (
-        <div>
-            <h2>Списки, доступные вам</h2>
+        <div className={cls.container}>
+            <span className={cls.listsTitle}>Списки, доступные вам</span>
             {lists.length === 0 ? (
-                <p>Нет списков, к которым у вас есть доступ</p>
+                <span className={cls.noLists}>Нет списков, к которым у вас есть доступ</span>
             ) : (
-                <ul>
-                    {lists.map(list => (
-                        <li key={list.id}>
-                            {list.name} — {list.items.length} товаров
-                            <button onClick={() => handleOpen(list.id)}>Открыть</button>
-                        </li>
-                    ))}
-                </ul>
+                <>
+                    <ul className={cls.list}>
+                        {lists.map(list => (
+                            <li className={cls.listItem} key={list.id}>
+                                <span className={cls.listName}>{list.name}</span>
+                                <Button success={true} onClick={() => handleOpen(list.id)} text="Открыть"/> 
+                            </li>
+                        ))}
+                    </ul>
+                </>
             )}
+            <Navigation/>
         </div>
+
+        
     );
 }

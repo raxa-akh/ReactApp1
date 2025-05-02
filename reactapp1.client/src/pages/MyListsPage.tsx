@@ -3,6 +3,10 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { useNavigate } from 'react-router-dom';
+import cls from "@/styles/MyListsPage.module.css"
+import Input from '@/components/input/Input';
+import Button from '@/components/button/Button';
+import Navigation from '@/components/navigation/Navigation';
 
 interface ShoppingList {
     id: number;
@@ -73,27 +77,38 @@ export default function MyListsPage() {
     };
 
     return (
-        <div>
-            <h2>Мои списки</h2>
+        <div className={cls.container}>
+            <span className={cls.title}>Мои списки</span>
+            <div className={cls.newList}>
+                <span className={cls.newListTitle}>Создать список</span>
+                <div className={cls.newListInner}>
+                    <Input type="text"
+                        placeholder="Введите название списка"
+                        value={newListName}
+                        onChange={(e) => setNewListName(e.target.value)}
+                        width="300px"
+                        />
+                    <Button success={true} text="Создать" onClick={() => handleCreate()}/>
+                </div>
+            </div>
 
-            <input
-                type="text"
-                placeholder="Введите название списка"
-                value={newListName}
-                onChange={(e) => setNewListName(e.target.value)}
-            />
-            <button onClick={handleCreate}>Создать список</button>
-
-            {lists.length === 0 && <p>У вас пока нет списков</p>}
-            <ul>
-                {lists.map((list) => (
-                    <li key={list.id}>
-                        {list.name}{' '}
-                        <button onClick={() => handleOpen(list.id)}>Открыть</button>
-                        <button onClick={() => handleDelete(list.id)}>Удалить</button>
-                    </li>
-                ))}
-            </ul>
+            {lists.length === 0 ? <span className={cls.noLists}>У вас пока нет списков</span> :
+                <div className={cls.lists}>
+                    <span className={cls.listsTitle}>Ваши списки</span>
+                    <ul className={cls.list}>
+                        {lists.map((list) => (
+                            <li className={cls.listItem} key={list.id}>
+                                <span className={cls.listName}>{list.name}</span>
+                                <div className={cls.buttons}>
+                                    <Button error={true} text='Удалить' onClick={() => handleDelete(list.id)}/>
+                                    <Button text='Открыть' onClick={() => handleOpen(list.id)}/>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            }
+            <Navigation/>
         </div>
     );
 }
