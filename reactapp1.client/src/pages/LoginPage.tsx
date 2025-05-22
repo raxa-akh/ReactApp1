@@ -96,7 +96,7 @@ export default function LoginPage() {
                             <input className={styles.input} type="email" placeholder="Email"  value={email} onChange={(e) => setEmail(e.target.value)} />
                             <input className={styles.input} type="password" placeholder="Пароль"  value={password} onChange={(e) => setPassword(e.target.value)} />
                             <input className={styles.input} type="password" placeholder="Повторите пароль"  value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-                            <button className={styles.mainBtn} onClick={() => {handleRegister()}} >Зарегистрироваться</button>
+                            <Button text="Зарегистрироваться" onClick={() => {handleRegister()}} />
                             {error && <p className={styles.error}>{error}</p>}
                             <button className={styles.secondBtn} onClick={() => flipCard()}>Уже есть аккаунт? Войти</button>
                         </div>
